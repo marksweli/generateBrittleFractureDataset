@@ -20,6 +20,8 @@
 - [项目结构](#项目结构)
 - [依赖环境](#依赖环境)
 - [编译流程](#编译流程)
+  - [命令行编译（Linux / macOS / Windows）](#命令行编译linux--macos--windows)
+  - [使用 VS Code 编译](#使用-vs-code-编译)
 - [运行说明](#运行说明)
 - [输出格式](#输出格式)
 - [算法原理](#算法原理)
@@ -114,6 +116,8 @@ generateBrittleFractureDataset/
 
 ## 编译流程
 
+### 命令行编译（Linux / macOS / Windows）
+
 ### 第一步：克隆仓库并初始化子模块
 
 ```bash
@@ -178,6 +182,121 @@ cmake --build . --config Release
 
 - Linux / macOS：`build/generateBrittleFractureDataset`
 - Windows：`build/Release/generateBrittleFractureDataset.exe`
+
+---
+
+### 使用 VS Code 编译
+
+VS Code 结合 **CMake Tools** 扩展可以提供图形化的 CMake 配置与编译体验，适合在 Windows、Linux 和 macOS 上使用。
+
+#### 所需扩展
+
+在 VS Code 的扩展市场（`Ctrl+Shift+X`）中搜索并安装以下扩展：
+
+| 扩展名称 | 扩展 ID | 说明 |
+|---------|---------|------|
+| C/C++ Extension Pack | `ms-vscode.cpptools-extension-pack` | 包含 C/C++ 语言支持、CMake Tools 等 |
+
+> 也可以单独安装 **CMake Tools**（`ms-vscode.cmake-tools`）和 **C/C++**（`ms-vscode.cpptools`）。
+
+#### 编译步骤
+
+**第一步：打开项目文件夹**
+
+```
+文件 → 打开文件夹... → 选择 generateBrittleFractureDataset/
+```
+
+或在终端中运行：
+
+```bash
+code generateBrittleFractureDataset/
+```
+
+**第二步：初始化子模块（首次使用时）**
+
+如果尚未初始化 Git 子模块，在 VS Code 终端（`` Ctrl+` ``）中运行：
+
+```bash
+git submodule update --init --recursive
+```
+
+**第三步：选择编译器套件（Kit）**
+
+VS Code 打开含 `CMakeLists.txt` 的文件夹后，CMake Tools 会自动提示选择编译器套件。也可以手动触发：
+
+- 点击底部状态栏的 **No Kit Selected** / 已选 Kit 名称
+- 或按 `Ctrl+Shift+P`，搜索并执行 `CMake: Select a Kit`
+- 选择合适的编译器：
+  - **Linux / macOS**：`GCC x.x.x` 或 `Clang x.x.x`
+  - **Windows**：`Visual Studio Build Tools 2019 Release - x86_amd64`（或对应版本）
+
+**第四步：选择构建类型（Build Variant）**
+
+- 点击底部状态栏的构建类型按钮（默认显示 `Debug`）
+- 或按 `Ctrl+Shift+P`，执行 `CMake: Select Variant`
+- 选择 **Release**（推荐，仿真速度更快）
+
+**第五步：配置 CMake**
+
+按 `Ctrl+Shift+P`，执行 `CMake: Configure`，或点击底部状态栏的 **CMake** 按钮。
+CMake Tools 会在项目根目录下自动创建 `build/` 目录并运行 `cmake ..`。
+
+**第六步：编译**
+
+使用以下任一方式触发编译：
+
+- 按快捷键 `F7`（或 `Ctrl+Shift+P` → `CMake: Build`）
+- 点击底部状态栏的 **⚙ Build** 按钮
+
+编译进度与错误信息会显示在底部的 **OUTPUT** 面板（选择 `CMake/Build` 频道）。
+
+**第七步：运行可执行文件**
+
+编译成功后，在 VS Code 终端中从项目根目录运行：
+
+```bash
+# Linux / macOS
+./build/generateBrittleFractureDataset
+
+# Windows（PowerShell 或命令提示符）
+.\build\Release\generateBrittleFractureDataset.exe
+```
+
+> **注意**：必须从项目根目录运行，确保程序能找到 `input/` 目录下的输入文件。
+
+#### 可选：配置调试（launch.json）
+
+如需在 VS Code 中调试程序，可在项目根目录下创建 `.vscode/launch.json`：
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug generateBrittleFractureDataset",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/generateBrittleFractureDataset",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+```
+
+> Windows 用户需将 `program` 改为 `${workspaceFolder}/build/Debug/generateBrittleFractureDataset.exe`，并将 `MIMode` 改为 `"msvc"` 或使用 LLDB。
 
 ---
 
@@ -321,6 +440,8 @@ This project uses the **Material Point Method (MPM)** to automatically generate 
 
 ## Build Instructions
 
+### Command Line
+
 ```bash
 # Clone with submodules
 git clone --recursive https://github.com/marksweli/generateBrittleFractureDataset.git
@@ -331,6 +452,25 @@ mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
+
+### VS Code
+
+1. Install the **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`) from the VS Code Marketplace.
+2. Open the project folder: **File → Open Folder…** → select `generateBrittleFractureDataset/`.
+3. If submodules are not yet initialized, run in the integrated terminal:
+   ```bash
+   git submodule update --init --recursive
+   ```
+4. When prompted, select a **Kit** (compiler) from the status bar, e.g. `GCC` on Linux/macOS or `Visual Studio Build Tools` on Windows.
+5. Select **Release** as the build variant from the status bar (or `Ctrl+Shift+P` → `CMake: Select Variant`).
+6. Press **F7** (or `Ctrl+Shift+P` → `CMake: Build`) to compile. Build output appears in the **OUTPUT → CMake/Build** panel.
+7. Run the executable from the project root:
+   ```bash
+   # Linux / macOS
+   ./build/generateBrittleFractureDataset
+   # Windows
+   .\build\Release\generateBrittleFractureDataset.exe
+   ```
 
 ## Running
 
